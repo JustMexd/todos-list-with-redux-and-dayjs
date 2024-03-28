@@ -1,42 +1,40 @@
 'use client'
+import dayjs from "dayjs";
 import Image from "next/image";
 import styles from "./page.module.css";
 import { useEffect,useState } from "react";
 
 export default function Home() {
 
-  const getLocalItems=()=>{
-    let list =localStorage.getItem('setNewItem');
+  const getLocalItems = () => {
+    let list = localStorage.getItem("setNewItem");
     console.log(list);
-    if(list){
-      return JSON.parse(localStorage.getItem('setNewItem'));
-    }else{
-  
-      return[];
+    if (list) {
+      return JSON.parse(list);
+    } else {
+      return [];
     }
-  }
+  };
 
 const  [newItem, setNewItem]=useState('');
 const [items, setItems]=useState(getLocalItems());
 const[toggleSubmit,setToggleSubmit]=useState(true);
 
 
-
-
-
-useEffect(
-  () => {
-  // extraer el valor del localStorage
-  const setItems = localStorage.getItem("item")
-  console.log("value", setItems)
-  if(setItems){
-    return JSON.parse(localStorage.getItem('items'))
-  }else{
-    []
+useEffect(() => {
+  const localStorageItems = localStorage.getItem("item");
+  console.log("value", localStorageItems);
+  if (localStorageItems) {
+    setItems(JSON.parse(localStorageItems));
+  } else {
+    setItems([]);
   }
-  }
-  
-  )
+}, []);
+
+useEffect(() => {
+  localStorage.setItem("item", JSON.stringify(items));
+}, [items]);
+
 
 function addItem(){
   if(!newItem){
@@ -45,7 +43,8 @@ function addItem(){
   }
   const item={
     id:Math.floor(Math.random()*1000),
-    value: newItem
+    value: newItem,
+    date: dayjs().format("YYYY-MM-DD HH:mm:ss")
   };
   setItems(oldList=>[...oldList,item]);
   setNewItem("");
@@ -79,7 +78,8 @@ return(
           <ul>
             {items.map(item=>{
               return(
-                <li key={item.id}>{item.value} <button onClick={()=>editItem(item.id)}>Editar</button> <button onClick={()=>deleteItem(item.id)}>X</button></li>
+                <li key={item.id}>
+                  {item.value} /{dayjs(item.date).format("YYYY-MM-DD HH:mm:ss")} <button onClick={()=>editItem(item.id)}>Editar</button> <button onClick={()=>deleteItem(item.id)}>X</button></li>
               )
             })}
           </ul>
